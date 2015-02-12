@@ -7,17 +7,26 @@ syntax ./gen_reads id
 'id' is an identifier used to distinguish files created due to this run of gen reads. All files created are given a suffix id.
 inputs: none
 outputs: Writes the following files:
-underlying_seq : Contains the underlying sequences that were generated for this experiment:
-
+  underlying_seq : Contains the underlying sequences that were generated for this experiment. 
+  prob_distribution : Contains the relative abundances of the sequences (in order)  generated for this experiment. 
+  num_reads : Contains the number of times each sequence was read during the experiment. 
+  reads_obtained : Contains the reads that were obtained after adding noise. Note that the reads here are not shuffled. 
+  Any use of this that requires shuffled reads must shuffle.
+  true_kmers : A list of all kmers in the underlying sequences
+  kmer_dict : Contains observed k-mers and their copy counts. Sorted in decreasing order of copy counts
+  s1_ : Contains Kmers corresponding to sequences with abundances less than 10^-6
+  s2_ : Contains Kmers corresponding to sequences with abundances between 10^-6 and 10^-5   
+  s3_ : Contains Kmers corresponding to sequences with abundances between 10^-5 and 10^-4
+  s4_ : Contains Kmers corresponding to sequences with abundances between 10^-4 and 10^-3
+  s5_ : Contains Kmers corresponding to sequences with abundances between 10^-4 and 10^-3
+  s6_ : Contains Kmers corresponding to sequences with abundances more than 10^-2
+  
+Note that the name of each  file written is suffixed with id.
 '''
 #!/usr/bin/env python
 
 import sys
 import random
-import itertools
-import profile
-import time
-import math
 from loc_lib import hamdist,mutations
 import operator
 import numpy as np
@@ -122,6 +131,65 @@ if __name__ == '__main__':
     g.close()
     
     
-'''Partition  the  true kmers based on thresholds. Note that this assumes that each kmer only appears in  only 1 read.'''
+    '''Partition  the  true kmers based on thresholds. '''
+    #Note that this assumes that each kmer only appears in  only 1 read.
     
+        
+    s1=set() # Kmers corresponding to sequences with abundances less than 10^-6
+    s2=set() # Kmers corresponding to sequences with abundances between 10^-6 and 10^-5   
+    s3=set() # Kmers corresponding to sequences with abundances between 10^-5 and 10^-4
+    s4=set() # Kmers corresponding to sequences with abundances between 10^-4 and 10^-3
+    s5=set() # Kmers corresponding to sequences with abundances between 10^-4 and 10^-3
+    s6=set() # Kmers corresponding to sequences with abundances more than 10^-2
     
+    for i in xrange(len(sequences)):
+        if p[i] < 10^(-6):
+            for j in xrange(L-k+1):
+                s1.add(sequences[i][j:j+k])
+        elif p[i] < 10^(-5):
+            for j in xrange(L-k+1):
+                s2.add(sequences[i][j:j+k])
+        elif p[i] < 10^(-4):
+            for j in xrange(L-k+1):
+                s3.add(sequences[i][j:j+k])
+        elif p[i] < 10^(-3):
+            for j in xrange(L-k+1):
+                s4.add(sequences[i][j:j+k])
+        elif p[i] < 10^(-2):
+            for j in xrange(L-k+1):
+                s5.add(sequences[i][j:j+k])
+        else:
+            for j in xrange(L-k+1):
+                s6.add(sequences[i][j:j+k])
+    
+    assert len(s1)+len(s2)+len(s3)+len(s4)+len(s5)+len(s6) == len(true_kmers)
+    
+    g=open('s1_'+ipid,'w')
+    for kmer in s1:
+        g.write(kmer+'\n')        
+    g.close()
+    
+    g=open('s2_'+ipid,'w')
+    for kmer in s2:
+        g.write(kmer+'\n')        
+    g.close()
+    
+    g=open('s3_'+ipid,'w')
+    for kmer in s3:
+        g.write(kmer+'\n')        
+    g.close()
+    
+    g=open('s4_'+ipid,'w')
+    for kmer in s4:
+        g.write(kmer+'\n')        
+    g.close()
+    
+    g=open('s5_'+ipid,'w')
+    for kmer in s5:
+        g.write(kmer+'\n')        
+    g.close()
+    
+    g=open('s6_'+ipid,'w')
+    for kmer in s6:
+        g.write(kmer+'\n')        
+    g.close()
