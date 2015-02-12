@@ -6,7 +6,8 @@ Created on Feb 11, 2015
 syntax ./gen_reads id
 'id' is an identifier used to distinguish files created due to this run of gen reads. All files created are given a suffix id.
 inputs: none
-outputs: Writes the following files:
+outputs: Writes the following 13 files:
+  parameters : Documents the parameters of the simulation
   underlying_seq : Contains the underlying sequences that were generated for this experiment. 
   prob_distribution : Contains the relative abundances of the sequences (in order)  generated for this experiment. 
   num_reads : Contains the number of times each sequence was read during the experiment. 
@@ -46,7 +47,21 @@ if __name__ == '__main__':
     k=25 # k-mer size
     error_prob=100 # noise rate is 1/error_prob
     ep=float(1)/error_prob #floating point representation of error probability
-
+    output_dir='../output/'
+    
+    
+    print 'Number of underlying sequences : '+str(m)+'.'
+    print 'Length of each sequence : '+str(L)+'.'
+    print 'Number of reads : '+str(N)+'.'
+    print 'K-mer length : '+str(k)+'.'
+    print 'Error probability : one in '+str(error_prob)+'.'
+    
+    g=open('parameters'+ipid,'w')
+    g.write('Number of underlying sequences : '+str(m)+'.\n')
+    g.write('Length of each sequence : '+str(L)+'.\n')
+    g.write('Number of reads : '+str(N)+'.\n')
+    g.write('K-mer length : '+str(k)+'.\n')
+    g.write('Error probability : one in '+str(error_prob)+'.\n')
     
     '''Generate Sequences'''
     sequences=[] #sequences store the underlying sequences in the reads
@@ -58,7 +73,7 @@ if __name__ == '__main__':
         sequences.append(seq)
 
     '''Write sequences to underlying_seq#'''
-    g=open('underlying_seq'+ipid,'w')
+    g=open(output_dir+'underlying_seq'+ipid,'w')
     for i in xrange(len(sequences)):
         g.write(str(sequences[i]) +'\n' )
 
@@ -68,7 +83,7 @@ if __name__ == '__main__':
     p=np.random.lognormal(0,2,m) # p is the abundance of each sequence
     p=p/sum(p);
     print 'Sum of distribution is '+str(sum(p))+'.'
-    g=open('prob_distribution'+ipid,'w')
+    g=open(output_dir+'prob_distribution'+ipid,'w')
     for i in xrange(len(p)):
         g.write(str(p[i])+'\n')
         
@@ -76,7 +91,7 @@ if __name__ == '__main__':
     
     '''Generate number of reads'''
     no_reads=np.random.multinomial(N,p) #no_reads is the number of reads of each of the sequences
-    g=open('num_reads'+ipid,'w')
+    g=open(output_dir+'num_reads'+ipid,'w')
     for i in xrange(len(no_reads)):
         g.write(str(no_reads[i])+'\n')
         
@@ -91,7 +106,7 @@ if __name__ == '__main__':
             
     assert len(reads)==N
     
-    g=open('reads_obtained'+ipid,'w')
+    g=open(output_dir+'reads_obtained'+ipid,'w')
     for i in xrange(len(reads)):
         g.write(str(reads[i])+'\n')
      
@@ -106,7 +121,7 @@ if __name__ == '__main__':
     
     assert len(true_kmers)==m*(L-k+1)
     
-    g=open('true_kmers'+ipid,'w')
+    g=open(output_dir+'true_kmers'+ipid,'w')
     for kmer in true_kmers:
         g.write(kmer+'\n')
         
@@ -125,7 +140,7 @@ if __name__ == '__main__':
                 
     
     kmers_sorted=sorted(kmer_dict.items(), key=operator.itemgetter(1),reverse=True)
-    g=open('kmer_dict'+ipid,'w')
+    g=open(output_dir+'kmer_dict'+ipid,'w')
     for kmer in kmers_sorted:
         g.write(kmer[0]+'\t'+str(kmer[1])+'\n')        
     g.close()
@@ -164,32 +179,32 @@ if __name__ == '__main__':
     
     assert len(s1)+len(s2)+len(s3)+len(s4)+len(s5)+len(s6) == len(true_kmers)
     
-    g=open('s1_'+ipid,'w')
+    g=open(output_dir+'s1_'+ipid,'w')
     for kmer in s1:
         g.write(kmer+'\n')        
     g.close()
     
-    g=open('s2_'+ipid,'w')
+    g=open(output_dir+'s2_'+ipid,'w')
     for kmer in s2:
         g.write(kmer+'\n')        
     g.close()
     
-    g=open('s3_'+ipid,'w')
+    g=open(output_dir+'s3_'+ipid,'w')
     for kmer in s3:
         g.write(kmer+'\n')        
     g.close()
     
-    g=open('s4_'+ipid,'w')
+    g=open(output_dir+'s4_'+ipid,'w')
     for kmer in s4:
         g.write(kmer+'\n')        
     g.close()
     
-    g=open('s5_'+ipid,'w')
+    g=open(output_dir+'s5_'+ipid,'w')
     for kmer in s5:
         g.write(kmer+'\n')        
     g.close()
     
-    g=open('s6_'+ipid,'w')
+    g=open(output_dir+'s6_'+ipid,'w')
     for kmer in s6:
         g.write(kmer+'\n')        
     g.close()
